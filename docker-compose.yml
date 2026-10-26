@@ -1,0 +1,124 @@
+name: delivery
+
+x-variaveis-app: &variaveis-app
+  TZ: ${TZ}
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: 5432
+  POSTGRES_DB: ${POSTGRES_DB}
+  POSTGRES_USER: ${POSTGRES_USER}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+  RABBITMQ_HOST: rabbitmq
+  RABBITMQ_PORT: 5672
+  RABBITMQ_USER: ${RABBITMQ_USER}
+  RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:?defina RABBITMQ_PASSWORD no .env}
+  FILA_BOLETOS: ${FILA_BOLETOS}
+  FILA_ENVIOS: ${FILA_ENVIOS}
+
+x-depende-da-infra: &depende-da-infra
+  rabbitmq:
+    condition: service_healthy
+  postgres:
+    condition: service_healthy
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    # o rabbitmq salva os dados numa pasta com o nome do nó; sem hostname fixo
+    # as filas somem quando o container é recriado
+    hostname: rabbitmq
+    environment:
+      TZ: ${TZ}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?defina RABBITMQ_PASSWORD no .env}
+    ports:
+      - "15672:15672"
+    volumes:
+      - dados_rabbitmq:/var/lib/rabbitmq
+    networks:
+      - rede_interna
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 10s
+      timeout: 10s
+      retries: 6
+      start_period: 30s
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16
+    environment:
+      TZ: ${TZ}
+      PGTZ: ${TZ}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+    volumes:
+      - dados_postgres:/var/lib/postgresql/data
+      - ./banco/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    networks:
+      - rede_interna
+    healthcheck:
+      # -h força TCP: enquanto roda o init.sql o postgres só escuta no socket
+      # local, então sem isso ele aparece healthy antes das tabelas existirem
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  api:
+    build: ./api
+    environment:
+      <<: *variaveis-app
+      PRAZO_PAGAMENTO_MINUTOS: ${PRAZO_PAGAMENTO_MINUTOS}
+      QTD_PEDIDOS_PICO: ${QTD_PEDIDOS_PICO}
+    ports:
+      - "8000:8000"
+    depends_on: *depende-da-infra
+    networks:
+      - rede_interna
+    restart: unless-stopped
+
+  # sem container_name e sem ports, senão o --scale quebra
+  worker-boletos:
+    build: ./worker-boletos
+    environment:
+      <<: *variaveis-app
+      TEMPO_PROCESSAMENTO_SEGUNDOS: ${TEMPO_PROCESSAMENTO_SEGUNDOS}
+      PRAZO_PAGAMENTO_MINUTOS: ${PRAZO_PAGAMENTO_MINUTOS}
+    deploy:
+      replicas: 1
+    depends_on: *depende-da-infra
+    networks:
+      - rede_interna
+    restart: unless-stopped
+
+  worker-envios:
+    build: ./worker-envios
+    environment:
+      <<: *variaveis-app
+      TEMPO_PROCESSAMENTO_SEGUNDOS: ${TEMPO_PROCESSAMENTO_SEGUNDOS}
+      PRAZO_ENVIO_MINUTOS: ${PRAZO_ENVIO_MINUTOS}
+    depends_on: *depende-da-infra
+    networks:
+      - rede_interna
+    restart: unless-stopped
+
+  agendador:
+    build: ./agendador
+    environment:
+      <<: *variaveis-app
+      INTERVALO_AGENDADOR_SEGUNDOS: ${INTERVALO_AGENDADOR_SEGUNDOS}
+    depends_on: *depende-da-infra
+    networks:
+      - rede_interna
+    restart: unless-stopped
+
+networks:
+  rede_interna:
+    driver: bridge
+
+volumes:
+  dados_postgres:
+  dados_rabbitmq:
