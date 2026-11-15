@@ -1,0 +1,70 @@
+worker-boletos-3  | 2026-11-15 11:00:18,880 [b292af2d4c4e] INFO Conectado a PostgreSQL
+worker-boletos-3  | 2026-11-15 11:00:18,891 [b292af2d4c4e] INFO Conectado a RabbitMQ
+worker-boletos-3  | 2026-11-15 11:00:18,893 [b292af2d4c4e] INFO Consumindo fila.boletos | prefetch=1 | processamento=1.0s | prazo=2.0min
+worker-boletos-2  | 2026-11-15 11:00:18,815 [065d7c3747eb] INFO Conectado a PostgreSQL
+worker-boletos-2  | 2026-11-15 11:00:18,827 [065d7c3747eb] INFO Conectado a RabbitMQ
+worker-boletos-2  | 2026-11-15 11:00:18,828 [065d7c3747eb] INFO Consumindo fila.boletos | prefetch=1 | processamento=1.0s | prazo=2.0min
+worker-boletos-2  | 2026-11-15 11:01:11,154 [065d7c3747eb] INFO pedido=5002 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-2  | 2026-11-15 11:01:12,157 [065d7c3747eb] INFO pedido=5006 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-3  | 2026-11-15 11:01:11,153 [b292af2d4c4e] INFO pedido=5001 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-3  | 2026-11-15 11:01:12,157 [b292af2d4c4e] INFO pedido=5005 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-2  | 2026-11-15 11:01:13,162 [065d7c3747eb] WARNING Conexão interrompida; reconectando em 3s
+worker-boletos-2  | 2026-11-15 11:01:16,166 [065d7c3747eb] INFO Conectado a PostgreSQL
+worker-boletos-2  | 2026-11-15 11:01:19,173 [065d7c3747eb] INFO Conectado a RabbitMQ
+worker-boletos-2  | 2026-11-15 11:01:19,175 [065d7c3747eb] INFO Consumindo fila.boletos | prefetch=1 | processamento=1.0s | prazo=2.0min
+worker-boletos-2  | 2026-11-15 11:01:19,182 [065d7c3747eb] INFO pedido=5009 | boleto já existente; reentrega ignorada | 0.01s
+worker-boletos-2  | 2026-11-15 11:01:19,184 [065d7c3747eb] INFO pedido=5012 | boleto já existente; reentrega ignorada | 0.00s
+worker-boletos-2  | 2026-11-15 11:01:20,190 [065d7c3747eb] INFO pedido=5014 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-4  | 2026-11-15 11:00:18,962 [eb645325f2f8] INFO Conectado a PostgreSQL
+worker-boletos-2  | 2026-11-15 11:01:21,193 [065d7c3747eb] INFO pedido=5017 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-2  | 2026-11-15 11:01:22,197 [065d7c3747eb] INFO pedido=5021 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-2  | 2026-11-15 11:01:23,204 [065d7c3747eb] INFO pedido=5025 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-2  | 2026-11-15 11:01:24,209 [065d7c3747eb] INFO pedido=5029 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-2  | 2026-11-15 11:01:25,213 [065d7c3747eb] INFO pedido=5033 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-2  | 2026-11-15 11:01:26,219 [065d7c3747eb] INFO pedido=5037 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-4  | 2026-11-15 11:00:18,972 [eb645325f2f8] INFO Conectado a RabbitMQ
+worker-boletos-4  | 2026-11-15 11:00:18,973 [eb645325f2f8] INFO Consumindo fila.boletos | prefetch=1 | processamento=1.0s | prazo=2.0min
+worker-boletos-2  | 2026-11-15 11:01:27,225 [065d7c3747eb] INFO pedido=5042 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-2  | 2026-11-15 11:01:28,227 [065d7c3747eb] INFO pedido=5047 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-2  | 2026-11-15 11:01:29,234 [065d7c3747eb] INFO pedido=5050 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-2  | 2026-11-15 11:01:30,240 [065d7c3747eb] INFO pedido=5054 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-2  | 2026-11-15 11:01:31,245 [065d7c3747eb] INFO pedido=5058 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-2  | 2026-11-15 11:01:32,251 [065d7c3747eb] INFO pedido=5061 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-2  | 2026-11-15 11:01:33,252 [065d7c3747eb] ERROR Falha no pedido 5065; devolvendo mensagem à fila
+worker-boletos-3  | 2026-11-15 11:01:13,162 [b292af2d4c4e] WARNING Conexão interrompida; reconectando em 3s
+worker-boletos-3  | 2026-11-15 11:01:16,166 [b292af2d4c4e] INFO Conectado a PostgreSQL
+worker-boletos-4  | 2026-11-15 11:01:10,189 [eb645325f2f8] INFO pedido=5000 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-4  | 2026-11-15 11:01:11,193 [eb645325f2f8] INFO pedido=5004 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-4  | 2026-11-15 11:01:12,195 [eb645325f2f8] INFO pedido=5008 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-1  | 2026-11-15 10:59:01,475 [660d5ea54ec0] INFO Conectado a RabbitMQ
+worker-boletos-1  | 2026-11-15 10:59:01,477 [660d5ea54ec0] INFO Consumindo fila.boletos | prefetch=1 | processamento=1.0s | prazo=2.0min
+worker-boletos-1  | 2026-11-15 10:59:01,480 [660d5ea54ec0] INFO pedido=4646 | boleto já existente; reentrega ignorada | 0.00s
+worker-boletos-1  | 2026-11-15 11:01:11,171 [660d5ea54ec0] INFO pedido=5003 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-1  | 2026-11-15 11:01:12,173 [660d5ea54ec0] INFO pedido=5007 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-1  | 2026-11-15 11:01:13,176 [660d5ea54ec0] WARNING Conexão interrompida; reconectando em 3s
+worker-boletos-1  | 2026-11-15 11:01:16,181 [660d5ea54ec0] INFO Conectado a PostgreSQL
+worker-boletos-1  | 2026-11-15 11:01:19,186 [660d5ea54ec0] INFO Conectado a RabbitMQ
+worker-boletos-1  | 2026-11-15 11:01:19,188 [660d5ea54ec0] INFO Consumindo fila.boletos | prefetch=1 | processamento=1.0s | prazo=2.0min
+worker-boletos-1  | 2026-11-15 11:01:20,194 [660d5ea54ec0] INFO pedido=5015 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-1  | 2026-11-15 11:01:21,196 [660d5ea54ec0] INFO pedido=5019 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-1  | 2026-11-15 11:01:22,199 [660d5ea54ec0] INFO pedido=5023 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-1  | 2026-11-15 11:01:23,205 [660d5ea54ec0] INFO pedido=5027 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-1  | 2026-11-15 11:01:24,210 [660d5ea54ec0] INFO pedido=5031 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-1  | 2026-11-15 11:01:25,214 [660d5ea54ec0] INFO pedido=5035 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-1  | 2026-11-15 11:01:26,219 [660d5ea54ec0] INFO pedido=5039 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-1  | 2026-11-15 11:01:27,225 [660d5ea54ec0] INFO pedido=5043 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-1  | 2026-11-15 11:01:28,228 [660d5ea54ec0] INFO pedido=5046 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-1  | 2026-11-15 11:01:29,234 [660d5ea54ec0] INFO pedido=5051 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-1  | 2026-11-15 11:01:30,240 [660d5ea54ec0] INFO pedido=5055 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-1  | 2026-11-15 11:01:31,246 [660d5ea54ec0] INFO pedido=5059 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-1  | 2026-11-15 11:01:32,251 [660d5ea54ec0] INFO pedido=5063 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-1  | 2026-11-15 11:01:33,252 [660d5ea54ec0] ERROR Falha no pedido 5066; devolvendo mensagem à fila
+worker-boletos-1  | psycopg2.OperationalError: server closed the connection unexpectedly
+worker-boletos-1  | 2026-11-15 11:01:33,253 [660d5ea54ec0] WARNING Conexão interrompida; reconectando em 3s
+worker-boletos-1  | 2026-11-15 11:01:36,275 [660d5ea54ec0] INFO Conectado a PostgreSQL
+worker-boletos-1  | 2026-11-15 11:01:36,279 [660d5ea54ec0] INFO Conectado a RabbitMQ
+worker-boletos-1  | 2026-11-15 11:01:36,281 [660d5ea54ec0] INFO Consumindo fila.boletos | prefetch=1 | processamento=1.0s | prazo=2.0min
+worker-boletos-1  | 2026-11-15 11:01:37,299 [660d5ea54ec0] INFO pedido=5068 | boleto gerado e pedido aguardando pagamento | 1.02s
+worker-boletos-1  | 2026-11-15 11:01:38,304 [660d5ea54ec0] INFO pedido=5069 | boleto gerado e pedido aguardando pagamento | 1.00s
+worker-boletos-1  | 2026-11-15 11:01:39,309 [660d5ea54ec0] INFO pedido=5074 | boleto gerado e pedido aguardando pagamento | 1.01s
+worker-boletos-1  | 2026-11-15 11:01:40,315 [660d5ea54ec0] INFO pedido=5078 | boleto gerado e pedido aguardando pagamento | 1.01s
