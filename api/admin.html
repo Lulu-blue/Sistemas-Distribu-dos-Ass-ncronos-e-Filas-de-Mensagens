@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101b2d">
+  <title>Painel administrativo | Delivery</title>
+  <style>
+    :root { color-scheme: light; --ink:#172338; --muted:#65738a; --line:#e3e9f1; --paper:#f4f7fb; --blue:#315cf5; --green:#137a55; --red:#b43c42; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.5 "Segoe UI",system-ui,sans-serif; }
+    header { color:#fff; background:linear-gradient(110deg,#101b2d,#1c3152); padding:28px max(22px,calc((100vw - 1180px)/2)); }
+    .topline { display:flex; justify-content:space-between; align-items:center; gap:16px; }
+    .brand { display:flex; align-items:center; gap:13px; }
+    .mark { display:grid; place-items:center; width:43px; height:43px; border-radius:13px; background:#315cf5; font-size:22px; font-weight:800; }
+    h1 { margin:0; font-size:22px; letter-spacing:-.02em; }
+    header p { margin:2px 0 0; color:#bcc9da; }
+    main { width:min(1180px,calc(100% - 36px)); margin:26px auto 56px; }
+    .toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-bottom:19px; }
+    .toolbar .spacer { flex:1; }
+    button, select { min-height:42px; border:1px solid var(--line); border-radius:9px; background:#fff; padding:0 14px; color:var(--ink); font:inherit; }
+    button { cursor:pointer; font-weight:650; transition:transform .12s,box-shadow .12s; }
+    button:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 5px 14px #13244018; }
+    button:disabled { opacity:.45; cursor:not-allowed; }
+    .primary { color:#fff; background:var(--blue); border-color:var(--blue); }
+    .quiet { color:var(--muted); }
+    .cards { display:grid; grid-template-columns:repeat(6,minmax(125px,1fr)); gap:12px; margin-bottom:20px; }
+    .card { padding:15px 16px; background:#fff; border:1px solid var(--line); border-radius:12px; box-shadow:0 3px 12px #13244008; }
+    .card .label { color:var(--muted); font-size:12px; font-weight:650; line-height:1.3; min-height:32px; }
+    .card .number { margin-top:6px; font-size:27px; font-weight:750; letter-spacing:-.04em; }
+    .section-head { display:flex; justify-content:space-between; align-items:end; gap:14px; margin:24px 0 11px; }
+    h2 { margin:0; font-size:19px; }
+    .hint,.updated { color:var(--muted); font-size:13px; }
+    .table-wrap { overflow:auto; border:1px solid var(--line); border-radius:12px; background:#fff; box-shadow:0 3px 12px #13244008; }
+    table { width:100%; border-collapse:collapse; min-width:890px; }
+    th,td { padding:13px 14px; border-bottom:1px solid #edf0f5; text-align:left; vertical-align:middle; }
+    th { background:#f9fbfd; color:#65738a; font-size:11px; letter-spacing:.07em; text-transform:uppercase; }
+    tbody tr:last-child td { border-bottom:0; }
+    .customer { font-weight:650; }
+    .sub { display:block; color:var(--muted); font-size:12px; font-weight:400; }
+    .badge { display:inline-flex; border-radius:999px; background:#edf1f6; padding:4px 9px; font-size:11px; font-weight:750; white-space:nowrap; }
+    .status-CRIADO { color:#75550b; background:#fff4d4; }
+    .status-AGUARDANDO_PAGAMENTO { color:#805019; background:#fff0df; }
+    .status-PAGO,.status-ENVIO_AGENDADO { color:#174b9a; background:#e9f1ff; }
+    .status-ENVIADO { color:#126246; background:#e1f5ec; }
+    .status-CANCELADO { color:#96343b; background:#fde9e9; }
+    .actions { display:flex; gap:7px; }
+    .small { min-height:34px; padding:0 10px; font-size:12px; }
+    .approve { color:#146b4c; border-color:#bce4d0; background:#f1fbf5; }
+    .cancel { color:#a3343a; border-color:#f0c9cb; background:#fff7f7; }
+    .empty { padding:34px 18px; text-align:center; color:var(--muted); }
+    #notice { position:fixed; right:20px; bottom:20px; z-index:5; max-width:min(440px,calc(100% - 40px)); padding:13px 17px; border-radius:10px; color:#fff; background:#20314a; box-shadow:0 8px 28px #101b2d38; opacity:0; transform:translateY(8px); pointer-events:none; transition:.2s; }
+    #notice.show { opacity:1; transform:translateY(0); }
+    #notice.error { background:#a82f37; }
+    @media(max-width:900px) { .cards { grid-template-columns:repeat(3,1fr); } }
+    @media(max-width:560px) { header { padding:20px 18px; } .cards { grid-template-columns:repeat(2,1fr); } .toolbar .spacer { display:none; } .toolbar { align-items:stretch; } select,.toolbar button { flex:1; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topline">
+      <div class="brand"><div class="mark" aria-hidden="true">D</div><div><h1>Delivery · Administração</h1><p>Pedidos, pagamentos e processamento assíncrono</p></div></div>
+      <span class="hint" style="color:#c8d3e2">Atualização automática · 3 s</span>
+    </div>
+  </header>
+  <main>
+    <div class="toolbar">
+      <button id="simulate" class="primary">＋ Simular pico de pedidos</button>
+      <label for="status-filter" class="quiet">Filtrar:</label>
+      <select id="status-filter" aria-label="Filtrar pedidos por status">
+        <option value="">Todos os status</option>
+        <option>CRIADO</option><option>AGUARDANDO_PAGAMENTO</option><option>PAGO</option>
+        <option>ENVIO_AGENDADO</option><option>ENVIADO</option><option>CANCELADO</option>
+      </select>
+      <span class="spacer"></span>
+      <button id="refresh" class="quiet">↻ Atualizar agora</button>
+    </div>
+
+    <section aria-label="Resumo de pedidos">
+      <div class="cards" id="cards"></div>
+    </section>
+
+    <div class="section-head">
+      <div><h2>Pedidos</h2><div class="hint">Ações disponíveis conforme o status atual.</div></div>
+      <span id="updated" class="updated">Carregando…</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Pedido</th><th>Cliente</th><th>Valor</th><th>Status</th><th>Boleto / vencimento</th><th>Ações</th></tr></thead>
+        <tbody id="orders"><tr><td colspan="6" class="empty">Carregando pedidos…</td></tr></tbody>
+      </table>
+    </div>
+  </main>
+  <div id="notice" role="status" aria-live="polite"></div>
+
+  <script>
+    const statuses = ["CRIADO", "AGUARDANDO_PAGAMENTO", "PAGO", "ENVIO_AGENDADO", "ENVIADO", "CANCELADO"];
+    const labels = { CRIADO:"Criado", AGUARDANDO_PAGAMENTO:"Aguardando pagamento", PAGO:"Pago", ENVIO_AGENDADO:"Envio agendado", ENVIADO:"Enviado", CANCELADO:"Cancelado" };
+    const cards = document.querySelector("#cards");
+    const orders = document.querySelector("#orders");
+    const filter = document.querySelector("#status-filter");
+    let noticeTimer;
+
+    function announce(message, error=false) {
+      const box = document.querySelector("#notice");
+      box.textContent = message;
+      box.classList.toggle("error", error);
+      box.classList.add("show");
+      clearTimeout(noticeTimer);
+      noticeTimer = setTimeout(() => box.classList.remove("show"), 3500);
+    }
+    async function request(url, options={}) {
+      const response = await fetch(url, { headers:{"Content-Type":"application/json"}, ...options });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.detail || `Falha HTTP ${response.status}`);
+      return data;
+    }
+    function makeCell(text, className="") {
+      const td = document.createElement("td");
+      td.textContent = text ?? "—";
+      if (className) td.className = className;
+      return td;
+    }
+    function prettyDate(value) {
+      return value ? new Date(value).toLocaleString("pt-BR", { dateStyle:"short", timeStyle:"short" }) : "—";
+    }
+    function drawCards(summary) {
+      cards.replaceChildren();
+      const entries = [["Total de pedidos", summary.total], ...statuses.map(s => [labels[s], summary.por_status[s]])];
+      for (const [label, count] of entries) {
+        const card = document.createElement("article"); card.className="card";
+        const title = document.createElement("div"); title.className="label"; title.textContent=label;
+        const number = document.createElement("div"); number.className="number"; number.textContent=count ?? 0;
+        card.append(title, number); cards.append(card);
+      }
+    }
+    function actionButton(label, cssClass, disabled, handler) {
+      const button = document.createElement("button");
+      button.className=`small ${cssClass}`; button.textContent=label; button.disabled=disabled;
+      button.addEventListener("click", handler);
+      return button;
+    }
+    async function runAction(id, action, question, success) {
+      if (!window.confirm(question)) return;
+      try { await request(`/pedidos/${id}/${action}`, { method:"POST" }); announce(success); await refreshAll(); }
+      catch (error) { announce(error.message, true); }
+    }
+    function drawOrders(rows) {
+      orders.replaceChildren();
+      if (!rows.length) {
+        const tr=document.createElement("tr"), td=document.createElement("td");
+        td.colSpan=6; td.className="empty"; td.textContent="Nenhum pedido encontrado para este filtro.";
+        tr.append(td); orders.append(tr); return;
+      }
+      for (const row of rows) {
+        const tr=document.createElement("tr");
+        tr.append(makeCell(`#${row.id}`));
+        const customer=makeCell(row.cliente,"customer");
+        const created=document.createElement("span"); created.className="sub"; created.textContent=`Criado ${prettyDate(row.criado_em)}`;
+        customer.append(created); tr.append(customer);
+        tr.append(makeCell(Number(row.valor).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})));
+        const badge=document.createElement("span"); badge.className=`badge status-${row.status}`; badge.textContent=labels[row.status] || row.status;
+        const statusCell=document.createElement("td"); statusCell.append(badge); tr.append(statusCell);
+        const boleto=makeCell(row.linha_digitavel || "Aguardando geração");
+        if (row.vencimento) { const due=document.createElement("span"); due.className="sub"; due.textContent=`Vence ${prettyDate(row.vencimento)}`; boleto.append(due); }
+        tr.append(boleto);
+        const actions=document.createElement("td"), group=document.createElement("div"); group.className="actions";
+        group.append(actionButton("Aprovar", "approve", row.status!=="AGUARDANDO_PAGAMENTO", () => runAction(row.id,"aprovar",`Aprovar o pagamento do pedido #${row.id}?`,"Pagamento aprovado.")));
+        group.append(actionButton("Cancelar", "cancel", !["CRIADO","AGUARDANDO_PAGAMENTO"].includes(row.status), () => runAction(row.id,"cancelar",`Cancelar o pedido #${row.id}?`,"Pedido cancelado.")));
+        actions.append(group); tr.append(actions); orders.append(tr);
+      }
+    }
+    async function refreshAll() {
+      try {
+        const query = new URLSearchParams({ limite:"200" });
+        if (filter.value) query.set("status",filter.value);
+        const [summary, rows] = await Promise.all([request("/api/admin/resumo"),request(`/api/admin/pedidos?${query}`)]);
+        drawCards(summary); drawOrders(rows);
+        document.querySelector("#updated").textContent=`Atualizado às ${new Date().toLocaleTimeString("pt-BR")}`;
+      } catch (error) {
+        document.querySelector("#updated").textContent="API indisponível";
+        if (!orders.dataset.failed) announce(`Não foi possível carregar o painel: ${error.message}`,true);
+        orders.dataset.failed="true";
+      }
+    }
+    document.querySelector("#simulate").addEventListener("click", async () => {
+      const button=document.querySelector("#simulate"); button.disabled=true;
+      try {
+        const result=await request("/pedidos/simular-pico",{method:"POST"});
+        announce(`Pico iniciado: ${result.quantidade} pedidos. A API continuará atendendo enquanto publica as mensagens.`);
+      } catch (error) { announce(error.message,true); }
+      finally { button.disabled=false; refreshAll(); }
+    });
+    document.querySelector("#refresh").addEventListener("click",refreshAll);
+    filter.addEventListener("change",refreshAll);
+    refreshAll(); setInterval(refreshAll,3000);
+  </script>
+</body>
+</html>

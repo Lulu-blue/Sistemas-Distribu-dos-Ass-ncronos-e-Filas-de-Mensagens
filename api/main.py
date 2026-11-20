@@ -8,7 +8,8 @@ from decimal import Decimal
 import pika
 import psycopg
 from faker import Faker
-from fastapi import BackgroundTasks, FastAPI, HTTPException, status
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Query, status
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [api] %(message)s")
@@ -33,7 +34,76 @@ QTD_PEDIDOS_PICO = int(os.environ["QTD_PEDIDOS_PICO"])
 TENTATIVAS_CONEXAO = 10
 ESPERA_ENTRE_TENTATIVAS = 3  # segundos
 
-app = FastAPI(title="Delivery - API (produtor)")
+app = FastAPI(title="Delivery - API e painel administrativo")
+
+STATUS_PEDIDO = (
+    "CRIADO",
+    "AGUARDANDO_PAGAMENTO",
+    "PAGO",
+    "ENVIO_AGENDADO",
+    "ENVIADO",
+    "CANCELADO",
+)
+
+
+@app.get("/", include_in_schema=False)
+def inicio():
+    """Abre o painel diretamente na raiz para facilitar a demonstração."""
+    return FileResponse("/app/admin.html")
+
+
+@app.get("/admin", include_in_schema=False)
+def painel_admin():
+    return FileResponse("/app/admin.html")
+
+
+@app.get("/api/admin/resumo")
+def resumo_pedidos():
+    """Retorna todos os status, inclusive os que ainda estão com zero pedidos."""
+    with conectar_banco() as conn:
+        linhas = conn.execute(
+            "SELECT status, COUNT(*) FROM pedidos GROUP BY status"
+        ).fetchall()
+    quantidades = {linha[0]: linha[1] for linha in linhas}
+    return {
+        "total": sum(quantidades.values()),
+        "por_status": {
+            situacao: quantidades.get(situacao, 0) for situacao in STATUS_PEDIDO
+        },
+    }
+
+
+@app.get("/api/admin/pedidos")
+def listar_pedidos(
+    filtro_status: str | None = Query(default=None, alias="status"),
+    limite: int = Query(default=100, ge=1, le=500),
+):
+    """Lista pedidos recentes e dados do boleto, quando já tiver sido gerado."""
+    if filtro_status and filtro_status not in STATUS_PEDIDO:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "status inválido")
+
+    consulta = """
+        SELECT p.id, p.cliente, p.valor, p.status, p.criado_em,
+               p.atualizado_em, p.previsao_envio,
+               b.linha_digitavel, b.vencimento, b.gerado_por
+        FROM pedidos AS p
+        LEFT JOIN boletos AS b ON b.pedido_id = p.id
+    """
+    parametros = []
+    if filtro_status:
+        consulta += " WHERE p.status = %s"
+        parametros.append(filtro_status)
+    consulta += " ORDER BY p.criado_em DESC, p.id DESC LIMIT %s"
+    parametros.append(limite)
+
+    with conectar_banco() as conn:
+        linhas = conn.execute(consulta, parametros).fetchall()
+
+    colunas = (
+        "id", "cliente", "valor", "status", "criado_em", "atualizado_em",
+        "previsao_envio", "linha_digitavel", "vencimento", "gerado_por",
+    )
+    return [dict(zip(colunas, linha)) for linha in linhas]
 
 
 
@@ -211,3 +281,30 @@ def aprovar_pagamento(pedido_id: int):
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "fila indisponível")
 
     return {"pedido_id": pedido_id, "status": "PAGO"}
+
+
+@app.post("/pedidos/{pedido_id}/cancelar")
+def cancelar_pedido(pedido_id: int):
+    """Cancela pedidos que ainda não foram pagos ou enviados."""
+    with conectar_banco() as conn:
+        linha = conn.execute(
+            """
+            UPDATE pedidos SET status = 'CANCELADO'
+            WHERE id = %s AND status IN ('CRIADO', 'AGUARDANDO_PAGAMENTO')
+            RETURNING id
+            """,
+            (pedido_id,),
+        ).fetchone()
+
+        if linha is None:
+            atual = conn.execute(
+                "SELECT status FROM pedidos WHERE id = %s", (pedido_id,)
+            ).fetchone()
+            if atual is None:
+                raise HTTPException(status.HTTP_404_NOT_FOUND, "pedido não encontrado")
+            raise HTTPException(
+                status.HTTP_409_CONFLICT,
+                "só é possível cancelar pedidos nos status CRIADO ou AGUARDANDO_PAGAMENTO",
+            )
+
+    return {"pedido_id": linha[0], "status": "CANCELADO"}
