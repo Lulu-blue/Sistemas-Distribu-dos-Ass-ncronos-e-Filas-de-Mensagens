@@ -21,6 +21,9 @@ with patch.dict(sys.modules, {
 }):
     spec.loader.exec_module(worker)
 
+# os testes simulam erros de propósito; sem isso os tracebacks do log poluem a saída
+worker.log.disabled = True
+
 
 class WorkerTests(unittest.TestCase):
     def test_commit_antes_do_ack(self):

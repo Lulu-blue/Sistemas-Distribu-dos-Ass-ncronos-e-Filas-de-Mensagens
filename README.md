@@ -65,7 +65,9 @@ Para encerrar, use `docker compose down`. Para encerrar e apagar os dados dos vo
 Os testes de cada serviço não precisam do Docker nem de dependências instaladas:
 
 ```bash
-python -m unittest discover -s worker-boletos/tests
-python -m unittest discover -s worker-envios/tests
-python -m unittest discover -s agendador/tests
+python3 -m unittest discover -s worker-boletos/tests
+python3 -m unittest discover -s worker-envios/tests
+python3 -m unittest discover -s agendador/tests
 ```
+
+No Windows (fora do WSL), troque `python3` por `python` ou `py`.

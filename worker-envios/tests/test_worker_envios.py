@@ -23,6 +23,9 @@ with patch.dict(
 ):
     spec.loader.exec_module(worker_envios)
 
+# os testes simulam erros de propósito; sem isso os tracebacks do log poluem a saída
+worker_envios.log.disabled = True
+
 
 class WorkerEnviosTests(unittest.TestCase):
     def test_commit_antes_do_ack_quando_pago(self):

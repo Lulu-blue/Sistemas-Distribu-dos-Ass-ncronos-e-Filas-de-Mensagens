@@ -69,6 +69,7 @@ services:
 
   api:
     build: ./api
+    init: true
     environment:
       <<: *variaveis-app
       PRAZO_PAGAMENTO_MINUTOS: ${PRAZO_PAGAMENTO_MINUTOS}
@@ -83,6 +84,8 @@ services:
   # sem container_name e sem ports, senão o --scale quebra
   worker-boletos:
     build: ./worker-boletos
+    # tini vira o PID 1 e repassa o SIGTERM, assim o container para na hora
+    init: true
     environment:
       <<: *variaveis-app
       TEMPO_PROCESSAMENTO_SEGUNDOS: ${TEMPO_PROCESSAMENTO_SEGUNDOS}
@@ -96,6 +99,7 @@ services:
 
   worker-envios:
     build: ./worker-envios
+    init: true
     environment:
       <<: *variaveis-app
       TEMPO_PROCESSAMENTO_SEGUNDOS: ${TEMPO_PROCESSAMENTO_SEGUNDOS}
@@ -107,6 +111,7 @@ services:
 
   agendador:
     build: ./agendador
+    init: true
     environment:
       <<: *variaveis-app
       INTERVALO_AGENDADOR_SEGUNDOS: ${INTERVALO_AGENDADOR_SEGUNDOS}
